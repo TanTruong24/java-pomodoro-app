@@ -44,6 +44,44 @@ java -version
 
 You can also run `org.example.pomodoro.MainApplication` directly from IntelliJ IDEA using JDK 21.
 
+## Build a portable Windows application
+
+Make sure the Windows icon exists at:
+
+```text
+src/main/resources/icons/app-icon.ico
+```
+
+Run the following commands from the project root in PowerShell, in this order:
+
+```powershell
+.\mvnw.cmd clean package
+
+.\mvnw.cmd dependency:copy-dependencies `
+  -DoutputDirectory=target/dependency
+
+if (Test-Path dist) {
+  Remove-Item -Recurse -Force dist
+}
+
+jpackage `
+  --type app-image `
+  --name Pomodoro `
+  --app-version 1.0.0 `
+  --module-path "target\pomodoro-1.0-SNAPSHOT.jar;target\dependency" `
+  --module "org.example.pomodoro/org.example.pomodoro.MainApplication" `
+  --icon "src\main\resources\icons\app-icon.ico" `
+  --dest dist
+```
+
+The portable application is generated at:
+
+```text
+dist/Pomodoro/
+```
+
+Launch it with `dist\Pomodoro\Pomodoro.exe`. Keep the complete `Pomodoro` directory together when moving the application because the launcher depends on its bundled `app` and `runtime` directories.
+
 ## Default timer settings
 
 | Session | Default |
