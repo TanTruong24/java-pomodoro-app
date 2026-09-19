@@ -10,11 +10,22 @@ public class FocusSession {
     private Instant endedAt;
 
     private int durationSeconds;
+    private PomodoroMode mode;
 
     public FocusSession(Instant startedAt, Instant endedAt, int durationSeconds) {
+        this(startedAt, endedAt, durationSeconds, PomodoroMode.FOCUS);
+    }
+
+    public FocusSession(
+            Instant startedAt,
+            Instant endedAt,
+            int durationSeconds,
+            PomodoroMode mode
+    ) {
         this.startedAt = startedAt;
         this.endedAt = endedAt;
         this.durationSeconds = durationSeconds;
+        this.mode = mode;
     }
 
     public Long getId() {
@@ -31,5 +42,9 @@ public class FocusSession {
 
     public int getDurationSeconds() {
         return durationSeconds;
+    }
+
+    public PomodoroMode getMode() {
+        return mode;
     }
 }

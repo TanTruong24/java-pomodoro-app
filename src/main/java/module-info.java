@@ -8,5 +8,6 @@ module org.example.pomodoro {
 
     opens org.example.pomodoro to javafx.fxml;
     opens org.example.pomodoro.controller to javafx.fxml;
+    opens org.example.pomodoro.view to javafx.fxml;
     exports org.example.pomodoro;
 }

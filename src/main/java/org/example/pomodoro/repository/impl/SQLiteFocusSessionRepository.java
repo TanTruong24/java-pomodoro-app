@@ -2,6 +2,7 @@ package org.example.pomodoro.repository.impl;
 
 import org.example.pomodoro.database.DatabaseConnection;
 import org.example.pomodoro.model.FocusSession;
+import org.example.pomodoro.model.PomodoroMode;
 import org.example.pomodoro.repository.FocusSessionRepository;
 
 import java.sql.*;
@@ -27,9 +28,10 @@ public class SQLiteFocusSessionRepository
                 INSERT INTO focus_session (
                     started_at,
                     ended_at,
-                    duration_seconds
+                    duration_seconds,
+                    mode
                 )
-                VALUES (?, ?, ?)
+                VALUES (?, ?, ?, ?)
                 """;
 
         try (
@@ -55,6 +57,8 @@ public class SQLiteFocusSessionRepository
                     session.getDurationSeconds()
             );
 
+            statement.setString(4, session.getMode().name());
+
             statement.executeUpdate();
 
         } catch (SQLException e) {
@@ -73,6 +77,7 @@ public class SQLiteFocusSessionRepository
                 FROM focus_session
                 WHERE started_at >= ?
                 AND started_at < ?
+                AND mode = 'FOCUS'
                 ORDER BY started_at DESC
                 """;
 
@@ -101,7 +106,10 @@ public class SQLiteFocusSessionRepository
                                 Instant.ofEpochMilli(
                                         result.getLong("ended_at")
                                 ),
-                                result.getInt("duration_seconds")
+                                result.getInt("duration_seconds"),
+                                PomodoroMode.valueOf(
+                                        result.getString("mode")
+                                )
                         )
                 );
             }
@@ -124,6 +132,7 @@ public class SQLiteFocusSessionRepository
                 FROM focus_session
                 WHERE started_at >= ?
                 AND started_at < ?
+                AND mode = 'FOCUS'
                 """;
 
         try (
@@ -143,6 +152,33 @@ public class SQLiteFocusSessionRepository
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int getTotalProductiveSeconds(
+            Instant from,
+            Instant to
+    ) {
+        String sql = """
+                SELECT COALESCE(SUM(duration_seconds), 0)
+                FROM focus_session
+                WHERE started_at >= ?
+                AND started_at < ?
+                AND mode IN ('FOCUS', 'SHORT_BREAK')
+                """;
+
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setLong(1, from.toEpochMilli());
+            statement.setLong(2, to.toEpochMilli());
+
+            ResultSet result = statement.executeQuery();
+            return result.getInt(1);
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
     }
 }

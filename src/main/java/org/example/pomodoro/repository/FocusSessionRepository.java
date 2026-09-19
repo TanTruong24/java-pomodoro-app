@@ -12,4 +12,6 @@ public interface FocusSessionRepository {
     List<FocusSession> findBetween(Instant from, Instant to);
 
     int getTotalFocusSeconds(Instant from, Instant to);
+
+    int getTotalProductiveSeconds(Instant from, Instant to);
 }

@@ -17,4 +17,17 @@ public interface PomodoroService {
     int getCurrentFocusNumber();
 
     int getCycleBeforeLongBreak();
+
+    int getFocusMinutes();
+
+    int getShortBreakMinutes();
+
+    int getLongBreakMinutes();
+
+    void updateSettings(
+            int focusMinutes,
+            int shortBreakMinutes,
+            int longBreakMinutes,
+            int cyclesBeforeLongBreak
+    );
 }
