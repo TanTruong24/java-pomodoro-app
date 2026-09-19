@@ -1,47 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox
-        xmlns="http://javafx.com/javafx"
-        xmlns:fx="http://javafx.com/fxml"
-        fx:controller="org.example.pomodoro.controller.PomodoroController"
-        alignment="CENTER"
-        spacing="20"
-        prefWidth="400"
-        prefHeight="300">
+<StackPane fx:id="appRoot"
+           xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.pomodoro.controller.PomodoroController"
+           stylesheets="@../css/pomodoro.css"
+           styleClass="app-root, theme-dark">
+    <padding>
+        <Insets top="18" right="20" bottom="20" left="20"/>
+    </padding>
 
-    <Label
-            fx:id="modeLabel"/>
+    <VBox maxWidth="1040" spacing="18" styleClass="app-shell">
+        <FlowPane alignment="CENTER_LEFT" hgap="16" vgap="8">
+            <VBox spacing="3">
+                <Label text="Pomodoro" styleClass="app-title"/>
+                <Label text="Focus with intention, rest at the right time."
+                       styleClass="app-subtitle"/>
+            </VBox>
+            <Label text="FOCUS TIMER" styleClass="brand-badge"/>
+            <ComboBox fx:id="themeComboBox"
+                      onAction="#handleThemeChanged"
+                      prefWidth="105"
+                      styleClass="theme-selector"/>
+            <ToggleButton fx:id="settingsToggleButton"
+                          text="⚙"
+                          onAction="#handleToggleSettings"
+                          styleClass="icon-button">
+                <tooltip>
+                    <Tooltip text="Timer settings"/>
+                </tooltip>
+            </ToggleButton>
+        </FlowPane>
 
-    <Label
-            fx:id="timerLabel"/>
+        <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <Tab text="Timer">
+                <ScrollPane fitToWidth="true"
+                            styleClass="responsive-scroll">
+                  <content>
+                    <FlowPane alignment="TOP_CENTER" hgap="22" vgap="22"
+                              prefWrapLength="900" styleClass="tab-content">
+                    <VBox alignment="CENTER" spacing="17"
+                          minWidth="300" prefWidth="500" maxWidth="520"
+                          styleClass="panel timer-panel">
+                        <Label fx:id="modeLabel" styleClass="mode-label"/>
 
-    <Label fx:id="cycleLabel"/>
+                        <StackPane minWidth="260" minHeight="260"
+                                   maxWidth="260" maxHeight="260"
+                                   styleClass="timer-circle">
+                            <VBox alignment="CENTER" spacing="7">
+                                <Label text="TIME REMAINING"
+                                       styleClass="timer-caption"/>
+                                <Label fx:id="timerLabel"
+                                       styleClass="timer-label"/>
+                            </VBox>
+                        </StackPane>
 
-    <HBox
-            alignment="CENTER"
-            spacing="10">
+                        <Label fx:id="cycleLabel" styleClass="cycle-label"/>
 
-        <Button
-                text="Start"
-                onAction="#handleStart"/>
+                        <FlowPane alignment="CENTER" hgap="10" vgap="10">
+                            <Button text="Start" onAction="#handleStart"
+                                    styleClass="primary-button"/>
+                            <Button text="Pause" onAction="#handlePause"
+                                    styleClass="secondary-button"/>
+                            <Button text="Reset" onAction="#handleReset"
+                                    styleClass="secondary-button"/>
+                            <Button text="Skip" onAction="#handleSkip"
+                                    styleClass="ghost-button"/>
+                        </FlowPane>
+                    </VBox>
 
-        <Button
-                text="Pause"
-                onAction="#handlePause"/>
+                    <VBox fx:id="settingsPanel"
+                          spacing="16" minWidth="260"
+                          prefWidth="320" maxWidth="340"
+                          visible="false" managed="false"
+                          styleClass="panel settings-panel">
+                        <VBox spacing="4">
+                            <Label text="Settings" styleClass="section-title"/>
+                            <Label text="Durations are measured in minutes."
+                                   styleClass="section-hint"/>
+                        </VBox>
 
-        <Button
-                text="Reset"
-                onAction="#handleReset"/>
+                        <VBox spacing="7">
+                            <Label text="Focus" styleClass="field-label"/>
+                            <Spinner fx:id="focusMinutesSpinner"
+                                     maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="7">
+                            <Label text="Short break" styleClass="field-label"/>
+                            <Spinner fx:id="shortBreakMinutesSpinner"
+                                     maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="7">
+                            <Label text="Long break" styleClass="field-label"/>
+                            <Spinner fx:id="longBreakMinutesSpinner"
+                                     maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="7">
+                            <Label text="Sessions before long break"
+                                   styleClass="field-label"/>
+                            <Spinner fx:id="cycleSpinner" maxWidth="Infinity"/>
+                        </VBox>
 
-        <Button
-                text="Skip"
-                onAction="#handleSkip"/>
+                        <Button text="Save settings"
+                                onAction="#handleSaveSettings"
+                                maxWidth="Infinity"
+                                styleClass="primary-button"/>
+                        <Label fx:id="settingStatusLabel" wrapText="true"
+                               styleClass="status-label"/>
+                    </VBox>
+                    </FlowPane>
+                  </content>
+                </ScrollPane>
+            </Tab>
 
-    </HBox>
-
-</VBox>
+            <Tab text="History">
+                <fx:include fx:id="historyView" source="history-view.fxml"/>
+            </Tab>
+        </TabPane>
+    </VBox>
+</StackPane>

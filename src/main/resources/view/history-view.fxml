@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.example.pomodoro.view.FocusHeatmapView?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.pomodoro.controller.HistoryController"
+      spacing="16"
+      styleClass="tab-content history-content">
+    <VBox spacing="4">
+        <Label text="Focus history"
+               styleClass="section-title large-section-title"/>
+        <Label text="Review completed sessions over any date range."
+               styleClass="section-hint"/>
+    </VBox>
+
+    <FlowPane alignment="CENTER_LEFT" hgap="10" vgap="10"
+              prefWrapLength="900" styleClass="filter-bar">
+        <ComboBox fx:id="historyFilterCombo"
+                  onAction="#handleFilterChanged"
+                  prefWidth="150"/>
+        <DatePicker fx:id="referenceDatePicker"
+                    onAction="#handleRefresh"
+                    prefWidth="150"/>
+        <FlowPane fx:id="customRangeBox" alignment="CENTER_LEFT"
+                  hgap="8" vgap="8">
+            <DatePicker fx:id="fromDatePicker"
+                        promptText="From" prefWidth="150"/>
+            <Label text="to" styleClass="field-label"/>
+            <DatePicker fx:id="toDatePicker"
+                        promptText="To" prefWidth="150"/>
+        </FlowPane>
+        <Button text="Apply" onAction="#handleRefresh"
+                styleClass="secondary-button"/>
+        <Label fx:id="historyStatusLabel" styleClass="error-label"/>
+    </FlowPane>
+
+    <VBox spacing="10" styleClass="target-card">
+        <FlowPane alignment="CENTER_LEFT" hgap="10" vgap="8">
+            <VBox spacing="3" prefWidth="230">
+                <Label text="TODAY'S TARGET" styleClass="summary-caption"/>
+                <Label text="Counts completed Focus and Short Break sessions"
+                       styleClass="section-hint"/>
+            </VBox>
+            <Spinner fx:id="targetHoursSpinner" prefWidth="105"/>
+            <Label text="hours" styleClass="field-label"/>
+            <Button text="Save target" onAction="#handleSaveTarget"
+                    styleClass="secondary-button"/>
+            <Label fx:id="targetStatusLabel" styleClass="status-label"/>
+        </FlowPane>
+        <ProgressBar fx:id="targetProgressBar" maxWidth="Infinity"
+                     progress="0"/>
+        <Label fx:id="targetProgressLabel" text="0%"
+               styleClass="target-progress-label"/>
+    </VBox>
+
+    <FlowPane hgap="12" vgap="12" prefWrapLength="900">
+        <VBox spacing="4" minWidth="190" prefWidth="260"
+              styleClass="summary-card">
+            <Label text="TOTAL FOCUS TIME" styleClass="summary-caption"/>
+            <Label fx:id="totalFocusLabel" text="0 minutes"
+                   styleClass="summary-value"/>
+        </VBox>
+        <VBox spacing="4" minWidth="190" prefWidth="260"
+              styleClass="summary-card">
+            <Label text="SESSIONS" styleClass="summary-caption"/>
+            <Label fx:id="sessionCountLabel" text="0"
+                   styleClass="summary-value"/>
+        </VBox>
+    </FlowPane>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS"
+             styleClass="history-view-tabs">
+        <Tab text="List">
+            <TableView fx:id="historyTable" styleClass="history-table">
+                <placeholder>
+                    <Label text="No focus sessions in this date range."
+                           styleClass="empty-label"/>
+                </placeholder>
+                <columns>
+                    <TableColumn fx:id="dateColumn" text="Date"
+                                 prefWidth="250"/>
+                    <TableColumn fx:id="startColumn" text="Started"
+                                 prefWidth="170"/>
+                    <TableColumn fx:id="endColumn" text="Ended"
+                                 prefWidth="170"/>
+                    <TableColumn fx:id="durationColumn" text="Duration"
+                                 prefWidth="190"/>
+                </columns>
+            </TableView>
+        </Tab>
+        <Tab text="Heatmap">
+            <VBox spacing="12" styleClass="heatmap-panel">
+                <Label text="Each cell represents one day. Darker cells mean more focus time."
+                       wrapText="true" styleClass="section-hint"/>
+                <ScrollPane fitToHeight="true" pannable="true"
+                            styleClass="heatmap-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <FocusHeatmapView fx:id="focusHeatmapView"/>
+                    </content>
+                </ScrollPane>
+                <FlowPane alignment="CENTER_LEFT" hgap="6" vgap="6">
+                    <Label text="Less" styleClass="heatmap-legend-label"/>
+                    <Label styleClass="heatmap-cell, heatmap-level-0"/>
+                    <Label styleClass="heatmap-cell, heatmap-level-1"/>
+                    <Label styleClass="heatmap-cell, heatmap-level-2"/>
+                    <Label styleClass="heatmap-cell, heatmap-level-3"/>
+                    <Label styleClass="heatmap-cell, heatmap-level-4"/>
+                    <Label text="More" styleClass="heatmap-legend-label"/>
+                </FlowPane>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>

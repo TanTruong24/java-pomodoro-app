@@ -1,0 +1,202 @@
+.app-root {
+    -fx-background-color: linear-gradient(to bottom right, #e7edf5, #d8e2ef);
+}
+
+.app-title,
+.section-title,
+.timer-label,
+.summary-value,
+.target-progress-label {
+    -fx-text-fill: #223047;
+}
+
+.app-subtitle,
+.section-hint,
+.empty-label,
+.timer-caption,
+.summary-caption {
+    -fx-text-fill: #64748b;
+}
+
+.brand-badge {
+    -fx-text-fill: #be123c;
+    -fx-background-color: rgba(244, 63, 94, 0.12);
+}
+
+.tab .tab-label {
+    -fx-text-fill: #64748b;
+}
+
+.tab:selected {
+    -fx-background-color: rgba(255, 255, 255, 0.70);
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #223047;
+}
+
+.panel,
+.summary-card,
+.filter-bar,
+.target-card {
+    -fx-background-color: rgba(255, 255, 255, 0.68);
+    -fx-border-color: rgba(255, 255, 255, 0.86);
+    -fx-effect: dropshadow(gaussian, rgba(51, 65, 85, 0.10), 18, 0.12, 0, 5);
+}
+
+.timer-circle {
+    -fx-background-color: rgba(255, 255, 255, 0.62);
+    -fx-border-color: rgba(244, 63, 94, 0.56);
+    -fx-effect: dropshadow(gaussian, rgba(190, 18, 60, 0.12), 25, 0.16, 0, 0);
+}
+
+.cycle-label,
+.field-label,
+.heatmap-axis-label,
+.heatmap-month-label,
+.heatmap-legend-label {
+    -fx-text-fill: #526176;
+}
+
+.focus-mode {
+    -fx-text-fill: #be123c;
+    -fx-background-color: rgba(244, 63, 94, 0.12);
+}
+
+.short-break-mode,
+.long-break-mode {
+    -fx-text-fill: #047857;
+    -fx-background-color: rgba(16, 185, 129, 0.13);
+}
+
+.secondary-button {
+    -fx-background-color: rgba(255, 255, 255, 0.72);
+    -fx-text-fill: #334155;
+    -fx-border-color: rgba(100, 116, 139, 0.20);
+}
+
+.secondary-button:hover,
+.ghost-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.94);
+}
+
+.ghost-button {
+    -fx-text-fill: #526176;
+    -fx-border-color: rgba(100, 116, 139, 0.24);
+}
+
+.icon-button {
+    -fx-text-fill: #526176;
+    -fx-background-color: rgba(255, 255, 255, 0.68);
+    -fx-border-color: rgba(100, 116, 139, 0.20);
+}
+
+.icon-button:hover,
+.icon-button:selected {
+    -fx-text-fill: #be123c;
+    -fx-background-color: rgba(255, 228, 230, 0.90);
+    -fx-border-color: rgba(244, 63, 94, 0.34);
+}
+
+.spinner,
+.combo-box,
+.date-picker {
+    -fx-background-color: rgba(255, 255, 255, 0.80);
+    -fx-border-color: rgba(100, 116, 139, 0.24);
+}
+
+.spinner .text-field,
+.date-picker .text-field {
+    -fx-text-fill: #223047;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button,
+.date-picker .arrow-button,
+.combo-box .arrow-button {
+    -fx-background-color: rgba(100, 116, 139, 0.10);
+}
+
+.spinner .increment-arrow,
+.spinner .decrement-arrow,
+.date-picker .arrow,
+.combo-box .arrow {
+    -fx-background-color: #526176;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #223047;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+}
+
+.combo-box-popup .list-cell {
+    -fx-text-fill: #223047;
+    -fx-background-color: #f8fafc;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #ffe4e6;
+}
+
+.status-label {
+    -fx-text-fill: #047857;
+}
+
+.error-label {
+    -fx-text-fill: #be123c;
+}
+
+.progress-bar > .track {
+    -fx-background-color: rgba(100, 116, 139, 0.18);
+}
+
+.history-table {
+    -fx-background-color: rgba(255, 255, 255, 0.50);
+    -fx-border-color: rgba(100, 116, 139, 0.16);
+}
+
+.history-table .column-header .label {
+    -fx-text-fill: #526176;
+}
+
+.history-table .table-row-cell {
+    -fx-border-color: transparent transparent rgba(100, 116, 139, 0.12) transparent;
+}
+
+.history-table .table-row-cell:hover,
+.history-table .table-row-cell:selected {
+    -fx-background-color: rgba(226, 232, 240, 0.72);
+}
+
+.history-table .table-cell {
+    -fx-text-fill: #334155;
+}
+
+.heatmap-scroll {
+    -fx-border-color: rgba(100, 116, 139, 0.16);
+}
+
+.heatmap-level-0 {
+    -fx-background-color: rgba(100, 116, 139, 0.15);
+}
+
+.heatmap-outside-range {
+    -fx-background-color: rgba(100, 116, 139, 0.06);
+}
+
+.heatmap-cell:hover {
+    -fx-border-color: rgba(51, 65, 85, 0.72);
+}
+
+.tooltip {
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #223047;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+}

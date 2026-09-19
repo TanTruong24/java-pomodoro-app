@@ -5,7 +5,7 @@ import org.example.pomodoro.model.PomodoroSetting;
 
 public class PomodoroServiceImpl implements org.example.pomodoro.service.PomodoroService {
 
-    private PomodoroSetting pomodoroSetting;
+    private final PomodoroSetting pomodoroSetting;
 
     private int currentFocus = 1;
 
@@ -28,8 +28,36 @@ public class PomodoroServiceImpl implements org.example.pomodoro.service.Pomodor
     }
 
     @Override
-    public int getCurrentDurationSeconds(){
-        return switch (pomodoroMode){
+    public int getFocusMinutes() {
+        return pomodoroSetting.getFocusMinutes();
+    }
+
+    @Override
+    public int getShortBreakMinutes() {
+        return pomodoroSetting.getShortBreakMinutes();
+    }
+
+    @Override
+    public int getLongBreakMinutes() {
+        return pomodoroSetting.getLongBreakMinutes();
+    }
+
+    @Override
+    public void updateSettings(
+            int focusMinutes,
+            int shortBreakMinutes,
+            int longBreakMinutes,
+            int cyclesBeforeLongBreak
+    ) {
+        pomodoroSetting.setFocusMinutes(focusMinutes);
+        pomodoroSetting.setShortBreakMinutes(shortBreakMinutes);
+        pomodoroSetting.setLongBreakMinutes(longBreakMinutes);
+        pomodoroSetting.setCycleBeforeLongBreak(cyclesBeforeLongBreak);
+    }
+
+    @Override
+    public int getCurrentDurationSeconds() {
+        return switch (pomodoroMode) {
             case FOCUS -> pomodoroSetting.getFocusMinutes() * 60;
             case LONG_BREAK -> pomodoroSetting.getLongBreakMinutes() * 60;
             case SHORT_BREAK -> pomodoroSetting.getShortBreakMinutes() * 60;
@@ -37,12 +65,12 @@ public class PomodoroServiceImpl implements org.example.pomodoro.service.Pomodor
     }
 
     @Override
-    public PomodoroMode getCurrentMode(){
+    public PomodoroMode getCurrentMode() {
         return pomodoroMode;
     }
 
     @Override
-    public int getCompleteCycles(){
+    public int getCompleteCycles() {
         return completeCycles;
     }
 
@@ -66,6 +94,7 @@ public class PomodoroServiceImpl implements org.example.pomodoro.service.Pomodor
             }
 
             case LONG_BREAK -> {
+                completeCycles++;
                 currentFocus = 1;
                 pomodoroMode = PomodoroMode.FOCUS;
             }
@@ -73,8 +102,9 @@ public class PomodoroServiceImpl implements org.example.pomodoro.service.Pomodor
     }
 
     @Override
-    public void reset(){
+    public void reset() {
         pomodoroMode = PomodoroMode.FOCUS;
         currentFocus = 1;
+        completeCycles = 0;
     }
 }

@@ -10,7 +10,11 @@ import java.util.function.IntConsumer;
 public class TimerServiceImpl implements org.example.pomodoro.service.TimerService {
 
     private Timeline timeline;
-    private  int remainingSeconds;
+    private int remainingSeconds;
+    private long deadlineEpochMillis;
+    private long pausedRemainingMillis;
+
+    private static final long MILLIS_PER_SECOND = 1_000;
 
     @Override
     public void start(
@@ -18,20 +22,47 @@ public class TimerServiceImpl implements org.example.pomodoro.service.TimerServi
             IntConsumer onTick,
             Runnable onFinished
     ) {
+        if (durationSeconds <= 0) {
+            throw new IllegalArgumentException(
+                    "durationSeconds must be positive"
+            );
+        }
+
         stop();
         remainingSeconds = durationSeconds;
+        pausedRemainingMillis = Math.multiplyExact(
+                (long) durationSeconds,
+                MILLIS_PER_SECOND
+        );
+        deadlineEpochMillis =
+                System.currentTimeMillis() + pausedRemainingMillis;
 
         onTick.accept(remainingSeconds);
 
         timeline = new Timeline(
                 new KeyFrame(
-                        Duration.seconds(1),
+                        Duration.millis(100),
                         event -> {
-                            remainingSeconds--;
-                            onTick.accept(remainingSeconds);
+                            long remainingMillis = Math.max(
+                                    0,
+                                    deadlineEpochMillis
+                                            - System.currentTimeMillis()
+                            );
 
-                            if (remainingSeconds <= 0){
+                            int nextRemainingSeconds = (int) Math.ceilDiv(
+                                    remainingMillis,
+                                    MILLIS_PER_SECOND
+                            );
+
+                            if (nextRemainingSeconds != remainingSeconds) {
+                                remainingSeconds = nextRemainingSeconds;
+                                onTick.accept(remainingSeconds);
+                            }
+
+                            if (remainingMillis == 0) {
                                 timeline.stop();
+                                timeline = null;
+                                pausedRemainingMillis = 0;
                                 onFinished.run();
                             }
                         }
@@ -43,14 +74,20 @@ public class TimerServiceImpl implements org.example.pomodoro.service.TimerServi
 
     @Override
     public void pause(){
-        if (timeline != null){
+        if (isRunning()) {
+            pausedRemainingMillis = Math.max(
+                    0,
+                    deadlineEpochMillis - System.currentTimeMillis()
+            );
             timeline.pause();
         }
     }
 
     @Override
     public void resume(){
-        if (timeline != null){
+        if (isPaused()) {
+            deadlineEpochMillis =
+                    System.currentTimeMillis() + pausedRemainingMillis;
             timeline.play();
         }
     }
@@ -61,6 +98,8 @@ public class TimerServiceImpl implements org.example.pomodoro.service.TimerServi
             timeline.stop();
             timeline = null;
         }
+
+        pausedRemainingMillis = 0;
     }
 
     @Override
