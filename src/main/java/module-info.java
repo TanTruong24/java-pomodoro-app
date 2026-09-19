@@ -1,6 +1,9 @@
 module org.example.pomodoro {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
+    requires javafx.media;
+    requires org.xerial.sqlitejdbc;
 
 
     opens org.example.pomodoro to javafx.fxml;

@@ -2,9 +2,9 @@ package org.example.pomodoro.model;
 
 public class PomodoroSetting {
 
-    private int focusMinutes = 25;
-    private int shortBreakMinutes = 5;
-    private int longBreakMinutes = 15;
+    private int focusMinutes = 2;
+    private int shortBreakMinutes = 1;
+    private int longBreakMinutes = 3;
     private int cycleBeforeLongBreak = 4;
 
     public int getFocusMinutes() {
