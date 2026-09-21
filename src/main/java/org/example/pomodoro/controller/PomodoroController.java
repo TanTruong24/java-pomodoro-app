@@ -13,6 +13,7 @@ import org.example.pomodoro.model.AppTheme;
 import org.example.pomodoro.model.PomodoroMode;
 import org.example.pomodoro.service.FocusHistoryService;
 import org.example.pomodoro.service.PomodoroService;
+import org.example.pomodoro.service.NotificationService;
 import org.example.pomodoro.service.SoundService;
 import org.example.pomodoro.service.TimerService;
 import org.example.pomodoro.service.ThemeService;
@@ -60,6 +61,7 @@ public class PomodoroController {
     private Instant sessionStartedAt;
 
     private final SoundService soundService;
+    private final NotificationService notificationService;
     private final PomodoroService pomodoroService;
     private final TimerService timerService;
     private final FocusHistoryService focusHistoryService;
@@ -70,12 +72,14 @@ public class PomodoroController {
             TimerService timerService,
             FocusHistoryService focusHistoryService,
             SoundService soundService,
+            NotificationService notificationService,
             ThemeService themeService
     ) {
         this.pomodoroService = pomodoroService;
         this.timerService = timerService;
         this.focusHistoryService = focusHistoryService;
         this.soundService = soundService;
+        this.notificationService = notificationService;
         this.themeService = themeService;
     }
 
@@ -303,6 +307,14 @@ public class PomodoroController {
         pomodoroService.moveToNextMode();
         updateCurrentMode();
         resetTimeDisplay();
+
+        notificationService.showSessionFinished(
+                appRoot.getScene().getWindow(),
+                finishedMode,
+                pomodoroService.getCurrentMode(),
+                pomodoroService.getCurrentDurationSeconds(),
+                themeComboBox.getValue()
+        );
 
         if (finishedMode == PomodoroMode.FOCUS) {
             startCurrentTimer();

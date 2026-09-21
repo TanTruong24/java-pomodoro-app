@@ -200,3 +200,23 @@
     -fx-border-radius: 7;
     -fx-background-radius: 7;
 }
+
+.session-toast {
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(51, 65, 85, 0.22), 26, 0.16, 0, 7);
+}
+
+.toast-title,
+.toast-message {
+    -fx-text-fill: #223047;
+}
+
+.toast-meta,
+.toast-close-button {
+    -fx-text-fill: #64748b;
+}
+
+.toast-close-button:hover {
+    -fx-background-color: rgba(100, 116, 139, 0.12);
+    -fx-text-fill: #223047;
+}

@@ -8,7 +8,7 @@ A personal Pomodoro desktop application built with Java 21 and JavaFX. It combin
 - Configurable number of focus sessions before a long break
 - Accurate countdown based on the current clock, including pause and resume
 - Automatic break start after a completed focus session
-- Audio notifications when sessions finish
+- Audio and top-right popup notifications when sessions finish
 - SQLite history for completed Focus and Short Break sessions
 - History filters by day, week, month, or custom date range
 - List and heatmap history views

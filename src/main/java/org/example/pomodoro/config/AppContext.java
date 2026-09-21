@@ -14,12 +14,14 @@ import org.example.pomodoro.repository.impl.SQLiteAppSettingRepository;
 import org.example.pomodoro.service.FocusHistoryService;
 import org.example.pomodoro.service.DailyTargetService;
 import org.example.pomodoro.service.PomodoroService;
+import org.example.pomodoro.service.NotificationService;
 import org.example.pomodoro.service.SoundService;
 import org.example.pomodoro.service.TimerService;
 import org.example.pomodoro.service.ThemeService;
 import org.example.pomodoro.service.impl.FocusHistoryServiceImpl;
 import org.example.pomodoro.service.impl.DailyTargetServiceImpl;
 import org.example.pomodoro.service.impl.PomodoroServiceImpl;
+import org.example.pomodoro.service.impl.JavaFxNotificationService;
 import org.example.pomodoro.service.impl.SoundServiceImpl;
 import org.example.pomodoro.service.impl.TimerServiceImpl;
 import org.example.pomodoro.service.impl.ThemeServiceImpl;
@@ -43,6 +45,7 @@ public class AppContext {
     private final ThemeService themeService;
 
     private final SoundService soundService;
+    private final NotificationService notificationService;
 
 
     public AppContext() {
@@ -89,6 +92,7 @@ public class AppContext {
         themeService = new ThemeServiceImpl(appSettingRepository);
 
         soundService = new SoundServiceImpl();
+        notificationService = new JavaFxNotificationService();
     }
 
     public PomodoroController createPomodoroController() {
@@ -97,6 +101,7 @@ public class AppContext {
                 timerService,
                 focusHistoryService,
                 soundService,
+                notificationService,
                 themeService
         );
     }

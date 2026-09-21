@@ -436,6 +436,120 @@
     -fx-min-width: 24;
 }
 
+.session-toast {
+    -fx-background-color: #282d36;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.42), 28, 0.18, 0, 8);
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.toast-accent {
+    -fx-min-width: 5;
+    -fx-pref-width: 5;
+    -fx-max-width: 5;
+    -fx-background-radius: 0 4 4 0;
+}
+
+.focus-toast .toast-accent {
+    -fx-background-color: #fb7185;
+}
+
+.break-toast .toast-accent {
+    -fx-background-color: #34d399;
+}
+
+.toast-icon {
+    -fx-min-width: 38;
+    -fx-min-height: 38;
+    -fx-pref-width: 38;
+    -fx-pref-height: 38;
+    -fx-background-radius: 999;
+}
+
+.focus-toast .toast-icon {
+    -fx-background-color: rgba(251, 113, 133, 0.16);
+}
+
+.break-toast .toast-icon {
+    -fx-background-color: rgba(52, 211, 153, 0.16);
+}
+
+.toast-icon-label {
+    -fx-font-family: "Segoe UI Symbol", "Segoe UI", sans-serif;
+    -fx-font-size: 19px;
+    -fx-font-weight: 700;
+}
+
+.focus-toast .toast-icon-label {
+    -fx-text-fill: #fb7185;
+}
+
+.break-toast .toast-icon-label {
+    -fx-text-fill: #34d399;
+}
+
+.toast-title {
+    -fx-text-fill: #f8fafc;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.toast-message {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 13px;
+}
+
+.toast-meta {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-padding: 4 0 0 0;
+}
+
+.toast-close-button {
+    -fx-min-width: 28;
+    -fx-min-height: 28;
+    -fx-pref-width: 28;
+    -fx-pref-height: 28;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 7;
+    -fx-text-fill: #94a3b8;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 19px;
+    -fx-font-weight: 400;
+}
+
+.toast-close-button:hover {
+    -fx-background-color: rgba(148, 163, 184, 0.14);
+    -fx-text-fill: #f8fafc;
+}
+
+.toast-progress {
+    -fx-padding: 0;
+    -fx-pref-height: 3;
+    -fx-min-height: 3;
+    -fx-max-height: 3;
+}
+
+.toast-progress > .track {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 0 14 14;
+}
+
+.toast-progress > .bar {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0 0 14 14;
+}
+
+.focus-toast .toast-progress {
+    -fx-accent: #fb7185;
+}
+
+.break-toast .toast-progress {
+    -fx-accent: #34d399;
+}
+
 .heatmap-month-label {
     -fx-padding: 0 0 2 0;
 }
