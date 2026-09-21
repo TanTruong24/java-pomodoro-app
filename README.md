@@ -70,6 +70,7 @@ jpackage `
   --app-version 1.0.0 `
   --module-path "target\pomodoro-1.0-SNAPSHOT.jar;target\dependency" `
   --module "org.example.pomodoro/org.example.pomodoro.MainApplication" `
+  --add-modules jdk.crypto.ec `
   --icon "src\main\resources\icons\app-icon.ico" `
   --dest dist
 ```
@@ -81,6 +82,8 @@ dist/Pomodoro/
 ```
 
 Launch it with `dist\Pomodoro\Pomodoro.exe`. Keep the complete `Pomodoro` directory together when moving the application because the launcher depends on its bundled `app` and `runtime` directories.
+
+The `jdk.crypto.ec` module is needed for HTTPS connections to Supabase. When rebuilding, replace the entire old `dist\Pomodoro` folder with the new app image. You can verify the bundled module in `dist\Pomodoro\runtime\release`.
 
 ## Default timer settings
 

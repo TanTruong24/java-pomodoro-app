@@ -141,11 +141,23 @@ public final class SupabaseApi {
             }
             return response.body();
         } catch (IOException exception) {
-            throw new SyncException("Could not reach Supabase", exception);
+            throw new SyncException(connectionErrorMessage(exception), exception);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new SyncException("Supabase request was interrupted", exception);
         }
+    }
+
+    private static String connectionErrorMessage(IOException exception) {
+        if (ModuleLayer.boot().findModule("jdk.crypto.ec").isEmpty()) {
+            return "The packaged Java runtime lacks jdk.crypto.ec. Rebuild with "
+                    + "--add-modules jdk.crypto.ec to enable HTTPS to Supabase.";
+        }
+        String reason = exception.getMessage();
+        String detail = exception.getClass().getSimpleName()
+                + (reason == null || reason.isBlank() ? "" : ": " + reason);
+        return "Could not reach Supabase (" +
+                (detail.length() > 240 ? detail.substring(0, 240) : detail) + ").";
     }
 
     static String errorMessage(int status, String body) {
