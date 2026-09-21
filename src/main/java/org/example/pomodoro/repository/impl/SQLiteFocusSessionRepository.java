@@ -9,6 +9,7 @@ import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class SQLiteFocusSessionRepository
         implements FocusSessionRepository {
@@ -29,9 +30,10 @@ public class SQLiteFocusSessionRepository
                     started_at,
                     ended_at,
                     duration_seconds,
-                    mode
+                    mode,
+                    sync_id
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
                 """;
 
         try (
@@ -58,6 +60,7 @@ public class SQLiteFocusSessionRepository
             );
 
             statement.setString(4, session.getMode().name());
+            statement.setString(5, UUID.randomUUID().toString());
 
             statement.executeUpdate();
 

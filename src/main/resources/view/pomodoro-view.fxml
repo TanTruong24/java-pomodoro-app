@@ -32,6 +32,12 @@
                        styleClass="app-subtitle"/>
             </VBox>
             <Label text="FOCUS TIMER" styleClass="brand-badge"/>
+            <Button fx:id="signInButton" text="Sign in" onAction="#handleSyncSignIn"
+                    styleClass="secondary-button"/>
+            <Button fx:id="syncButton" text="Sync now" onAction="#handleSyncNow"
+                    styleClass="secondary-button"/>
+            <Label fx:id="syncStatusLabel" text="Local only" wrapText="true"
+                   maxWidth="260" styleClass="section-hint"/>
             <ComboBox fx:id="themeComboBox"
                       onAction="#handleThemeChanged"
                       prefWidth="105"

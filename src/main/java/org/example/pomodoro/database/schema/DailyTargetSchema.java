@@ -11,12 +11,22 @@ public class DailyTargetSchema implements Schema {
         String sql = """
                 CREATE TABLE IF NOT EXISTS app_setting (
                     setting_key TEXT PRIMARY KEY,
-                    setting_value TEXT NOT NULL
+                    setting_value TEXT NOT NULL,
+                    dirty INTEGER NOT NULL DEFAULT 1
                 )
                 """;
 
         try (Statement statement = connection.createStatement()) {
             statement.execute(sql);
+            boolean hasDirty = false;
+            try (var columns = statement.executeQuery("PRAGMA table_info(app_setting)")) {
+                while (columns.next()) {
+                    hasDirty |= "dirty".equalsIgnoreCase(columns.getString("name"));
+                }
+            }
+            if (!hasDirty) {
+                statement.execute("ALTER TABLE app_setting ADD COLUMN dirty INTEGER NOT NULL DEFAULT 1");
+            }
         }
     }
 }

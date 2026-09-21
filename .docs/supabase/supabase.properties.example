@@ -1,0 +1,4 @@
+# Copy this file to the application's data directory as supabase.properties.
+# These values identify the Supabase project; do not put a secret/service-role key here.
+url=https://YOUR_PROJECT_REF.supabase.co
+publishableKey=sb_publishable_YOUR_KEY

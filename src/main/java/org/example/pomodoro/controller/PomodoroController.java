@@ -1,12 +1,20 @@
 package org.example.pomodoro.controller;
 
 import javafx.fxml.FXML;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.example.pomodoro.model.AppTheme;
@@ -17,10 +25,18 @@ import org.example.pomodoro.service.NotificationService;
 import org.example.pomodoro.service.SoundService;
 import org.example.pomodoro.service.TimerService;
 import org.example.pomodoro.service.ThemeService;
+import org.example.pomodoro.service.TimerSettingsStore;
+import org.example.pomodoro.sync.SyncService;
+import org.example.pomodoro.sync.SupabaseApi;
 
 import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PomodoroController {
 
@@ -57,6 +73,12 @@ public class PomodoroController {
     private ToggleButton settingsToggleButton;
     @FXML
     private VBox settingsPanel;
+    @FXML
+    private Button signInButton;
+    @FXML
+    private Button syncButton;
+    @FXML
+    private Label syncStatusLabel;
 
     private Instant sessionStartedAt;
 
@@ -66,6 +88,15 @@ public class PomodoroController {
     private final TimerService timerService;
     private final FocusHistoryService focusHistoryService;
     private final ThemeService themeService;
+    private final TimerSettingsStore timerSettingsStore;
+    private final SyncService syncService;
+    private final ExecutorService syncExecutor = Executors.newSingleThreadExecutor(task -> {
+        Thread thread = new Thread(task, "pomodoro-sync");
+        thread.setDaemon(true);
+        return thread;
+    });
+    private final AtomicBoolean syncBusy = new AtomicBoolean();
+    private boolean applyingRemoteSettings;
 
     public PomodoroController(
             PomodoroService pomodoroService,
@@ -73,7 +104,9 @@ public class PomodoroController {
             FocusHistoryService focusHistoryService,
             SoundService soundService,
             NotificationService notificationService,
-            ThemeService themeService
+            ThemeService themeService,
+            TimerSettingsStore timerSettingsStore,
+            SyncService syncService
     ) {
         this.pomodoroService = pomodoroService;
         this.timerService = timerService;
@@ -81,6 +114,8 @@ public class PomodoroController {
         this.soundService = soundService;
         this.notificationService = notificationService;
         this.themeService = themeService;
+        this.timerSettingsStore = timerSettingsStore;
+        this.syncService = syncService;
     }
 
     @FXML
@@ -89,6 +124,149 @@ public class PomodoroController {
         initializeSettings();
         updateCurrentMode();
         resetTimeDisplay();
+        boolean configured = syncService != null;
+        signInButton.setDisable(!configured);
+        syncButton.setDisable(!configured);
+        syncStatusLabel.setText(configured ? "Sign in to sync" : "Local only");
+    }
+
+    public void startAutoSync() {
+        if (syncService == null) {
+            return;
+        }
+        try {
+            if (syncService.hasSavedLogin()) {
+                runSync(syncService::sync, false, "Automatic sync");
+            }
+        } catch (RuntimeException exception) {
+            syncStatusLabel.setText("Saved login unavailable; sign in again");
+            LOGGER.log(Level.WARNING, "Could not read saved Supabase login", exception);
+        }
+    }
+
+    public void syncOnClose() {
+        if (syncService == null) {
+            syncExecutor.shutdownNow();
+            return;
+        }
+        try {
+            if (syncService.hasSavedLogin()) {
+                Future<?> attempt = syncExecutor.submit(syncService::uploadOnly);
+                attempt.get(5, TimeUnit.SECONDS);
+            }
+        } catch (Exception exception) {
+            LOGGER.log(Level.INFO,
+                    "Sync on close did not finish; data remains local: " + exception.getMessage());
+        } finally {
+            syncExecutor.shutdownNow();
+        }
+    }
+
+    @FXML
+    private void handleSyncNow() {
+        runSync(syncService::sync, true, "Supabase sync");
+    }
+
+    @FXML
+    private void handleSyncSignIn() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Supabase sign in");
+        dialog.setHeaderText("Use the same account on each computer");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        TextField email = new TextField();
+        email.setPromptText("Email");
+        PasswordField password = new PasswordField();
+        password.setPromptText("Password");
+        GridPane fields = new GridPane();
+        fields.setHgap(10);
+        fields.setVgap(10);
+        fields.add(new Label("Email"), 0, 0);
+        fields.add(email, 1, 0);
+        fields.add(new Label("Password"), 0, 1);
+        fields.add(password, 1, 1);
+        dialog.getDialogPane().setContent(fields);
+        if (dialog.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK
+                && !email.getText().isBlank() && !password.getText().isBlank()) {
+            String emailValue = email.getText().trim();
+            String passwordValue = password.getText();
+            runSync(() -> syncService.signIn(emailValue, passwordValue),
+                    true, "Supabase sign-in");
+        }
+    }
+
+    private void runSync(Runnable action, boolean showAlert, String title) {
+        if (!syncBusy.compareAndSet(false, true)) {
+            return;
+        }
+        syncStatusLabel.setText("Syncing...");
+        syncButton.setDisable(true);
+        signInButton.setDisable(true);
+        syncExecutor.submit(() -> {
+            try {
+                action.run();
+                Platform.runLater(() -> {
+                    try {
+                        reloadFromLocalDatabase();
+                        syncStatusLabel.setText("Synced");
+                    } catch (RuntimeException exception) {
+                        showSyncError(exception, showAlert, title);
+                    }
+                });
+            } catch (RuntimeException exception) {
+                if (exception instanceof SupabaseApi.SyncException) {
+                    LOGGER.log(Level.INFO, "Supabase sync failed: {0}",
+                            exception.getMessage());
+                } else {
+                    LOGGER.log(Level.WARNING, "Supabase sync failed", exception);
+                }
+                Platform.runLater(() -> showSyncError(exception, showAlert, title));
+            } finally {
+                syncBusy.set(false);
+                Platform.runLater(() -> {
+                    syncButton.setDisable(false);
+                    signInButton.setDisable(false);
+                });
+            }
+        });
+    }
+
+    private void showSyncError(RuntimeException exception, boolean showAlert,
+                               String title) {
+        String message = exception.getMessage();
+        if (message == null || message.isBlank()) {
+            message = "Unexpected sync error. Local data has been kept.";
+        }
+        syncStatusLabel.setText(message);
+        if (showAlert) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(title);
+            alert.setHeaderText(title + " failed");
+            alert.setContentText(message);
+            alert.show();
+        }
+    }
+
+    private void reloadFromLocalDatabase() {
+        applyingRemoteSettings = true;
+        try {
+            AppTheme theme = themeService.getTheme();
+            themeComboBox.setValue(theme);
+            applyTheme(theme);
+        } finally {
+            applyingRemoteSettings = false;
+        }
+        if (!timerService.isRunning() && !timerService.isPaused()) {
+            timerSettingsStore.loadInto(pomodoroService);
+            focusMinutesSpinner.getValueFactory().setValue(pomodoroService.getFocusMinutes());
+            shortBreakMinutesSpinner.getValueFactory().setValue(pomodoroService.getShortBreakMinutes());
+            longBreakMinutesSpinner.getValueFactory().setValue(pomodoroService.getLongBreakMinutes());
+            cycleSpinner.getValueFactory().setValue(pomodoroService.getCycleBeforeLongBreak());
+            updateCurrentMode();
+            resetTimeDisplay();
+        }
+        if (historyViewController != null) {
+            historyViewController.reloadSyncedSettings();
+        }
     }
 
     private void initializeTheme() {
@@ -104,8 +282,13 @@ public class PomodoroController {
             LOGGER.log(Level.WARNING, "Could not load theme preference", exception);
         }
 
-        themeComboBox.setValue(savedTheme);
-        applyTheme(savedTheme);
+        applyingRemoteSettings = true;
+        try {
+            themeComboBox.setValue(savedTheme);
+            applyTheme(savedTheme);
+        } finally {
+            applyingRemoteSettings = false;
+        }
     }
 
     @FXML
@@ -117,6 +300,10 @@ public class PomodoroController {
         }
 
         applyTheme(selectedTheme);
+
+        if (applyingRemoteSettings) {
+            return;
+        }
 
         try {
             themeService.updateTheme(selectedTheme);
@@ -264,6 +451,7 @@ public class PomodoroController {
                     longBreakMinutes,
                     cycles
             );
+            timerSettingsStore.save(pomodoroService);
 
             handleReset();
             settingStatusLabel.setText("Settings saved. Timer reset.");

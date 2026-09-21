@@ -6,6 +6,7 @@ import org.example.pomodoro.database.DatabaseConnection;
 import org.example.pomodoro.database.DatabaseInitializer;
 import org.example.pomodoro.database.schema.FocusSessionSchema;
 import org.example.pomodoro.database.schema.DailyTargetSchema;
+import org.example.pomodoro.database.schema.SyncAccountSchema;
 import org.example.pomodoro.model.PomodoroSetting;
 import org.example.pomodoro.repository.FocusSessionRepository;
 import org.example.pomodoro.repository.AppSettingRepository;
@@ -18,6 +19,12 @@ import org.example.pomodoro.service.NotificationService;
 import org.example.pomodoro.service.SoundService;
 import org.example.pomodoro.service.TimerService;
 import org.example.pomodoro.service.ThemeService;
+import org.example.pomodoro.service.TimerSettingsStore;
+import org.example.pomodoro.sync.AuthSessionStore;
+import org.example.pomodoro.sync.LocalSyncRepository;
+import org.example.pomodoro.sync.SupabaseApi;
+import org.example.pomodoro.sync.SupabaseConfig;
+import org.example.pomodoro.sync.SyncService;
 import org.example.pomodoro.service.impl.FocusHistoryServiceImpl;
 import org.example.pomodoro.service.impl.DailyTargetServiceImpl;
 import org.example.pomodoro.service.impl.PomodoroServiceImpl;
@@ -46,6 +53,8 @@ public class AppContext {
 
     private final SoundService soundService;
     private final NotificationService notificationService;
+    private final TimerSettingsStore timerSettingsStore;
+    private final SyncService syncService;
 
 
     public AppContext() {
@@ -58,7 +67,8 @@ public class AppContext {
                         databaseConnection,
                         List.of(
                                 new FocusSessionSchema(),
-                                new DailyTargetSchema()
+                                new DailyTargetSchema(),
+                                new SyncAccountSchema()
                         )
                 );
 
@@ -78,6 +88,9 @@ public class AppContext {
         appSettingRepository =
                 new SQLiteAppSettingRepository(databaseConnection);
 
+        timerSettingsStore = new TimerSettingsStore(appSettingRepository);
+        timerSettingsStore.loadInto(pomodoroService);
+
         focusHistoryService =
                 new FocusHistoryServiceImpl(
                         focusSessionRepository
@@ -93,6 +106,11 @@ public class AppContext {
 
         soundService = new SoundServiceImpl();
         notificationService = new JavaFxNotificationService();
+        syncService = SupabaseConfig.load()
+                .map(config -> new SyncService(
+                        new LocalSyncRepository(databaseConnection),
+                        new SupabaseApi(config), new AuthSessionStore()))
+                .orElse(null);
     }
 
     public PomodoroController createPomodoroController() {
@@ -102,7 +120,9 @@ public class AppContext {
                 focusHistoryService,
                 soundService,
                 notificationService,
-                themeService
+                themeService,
+                timerSettingsStore,
+                syncService
         );
     }
 
