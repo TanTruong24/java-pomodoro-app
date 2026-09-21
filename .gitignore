@@ -43,3 +43,5 @@ data/
 *.db
 *.db-shm
 *.db-wal
+supabase.properties
+supabase-session.properties

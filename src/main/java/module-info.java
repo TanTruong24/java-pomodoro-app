@@ -4,6 +4,8 @@ module org.example.pomodoro {
     requires java.sql;
     requires javafx.media;
     requires org.xerial.sqlitejdbc;
+    requires java.net.http;
+    requires com.google.gson;
 
 
     opens org.example.pomodoro to javafx.fxml;

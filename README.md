@@ -115,6 +115,10 @@ The app stores its SQLite database in the current user's application-data direct
 
 Older databases located at `data/pomodoro.db` are copied to the user-data directory automatically when no destination database exists.
 
+## Sync across computers
+
+The app can sync completed sessions and saved settings through Supabase while keeping SQLite as its local data store. Setup instructions and the required SQL script are in [`.docs/supabase/README.md`](.docs/supabase/README.md). Sync is optional; without configuration, the app remains local-only.
+
 ## Application icon
 
 Place a PNG icon at:

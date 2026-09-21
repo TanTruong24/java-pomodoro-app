@@ -46,10 +46,10 @@ public class SQLiteAppSettingRepository implements AppSettingRepository {
     @Override
     public void save(String key, String value) {
         String sql = """
-                INSERT INTO app_setting (setting_key, setting_value)
-                VALUES (?, ?)
+                INSERT INTO app_setting (setting_key, setting_value, dirty)
+                VALUES (?, ?, 1)
                 ON CONFLICT(setting_key)
-                DO UPDATE SET setting_value = excluded.setting_value
+                DO UPDATE SET setting_value = excluded.setting_value, dirty = 1
                 """;
 
         try (

@@ -28,6 +28,10 @@ public final class DatabaseConfig {
         return "jdbc:sqlite:" + DB_PATH.toAbsolutePath();
     }
 
+    public static Path getDataDirectory() {
+        return DATA_DIR;
+    }
+
     private static void migrateLegacyDatabase() throws IOException {
         Path target = DB_PATH.toAbsolutePath();
 

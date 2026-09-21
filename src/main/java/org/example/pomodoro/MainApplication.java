@@ -16,6 +16,7 @@ import java.util.Locale;
 public class MainApplication extends Application {
 
     private AppContext appContext;
+    private PomodoroController pomodoroController;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -43,6 +44,7 @@ public class MainApplication extends Application {
         });
 
         Scene scene = new Scene(loader.load(), 980, 700);
+        pomodoroController = loader.getController();
 
         stage.setTitle("Pomodoro");
 
@@ -53,6 +55,14 @@ public class MainApplication extends Application {
 
         stage.setScene(scene);
         stage.show();
+        pomodoroController.startAutoSync();
+    }
+
+    @Override
+    public void stop() {
+        if (pomodoroController != null) {
+            pomodoroController.syncOnClose();
+        }
     }
 
     public static void main(String[] args) {

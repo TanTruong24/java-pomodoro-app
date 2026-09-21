@@ -233,6 +233,12 @@ public class HistoryController {
         refreshDailyTargetProgress();
     }
 
+    public void reloadSyncedSettings() {
+        targetHoursSpinner.getValueFactory().setValue(
+                dailyTargetService.getTargetMinutes() / 60.0);
+        refresh();
+    }
+
     private void refreshDailyTargetProgress() {
         try {
             LocalDate today = LocalDate.now(zoneId);
