@@ -5,6 +5,7 @@ module org.example.pomodoro {
     requires javafx.media;
     requires org.xerial.sqlitejdbc;
     requires java.net.http;
+    requires jdk.crypto.ec;
     requires com.google.gson;
 
 
